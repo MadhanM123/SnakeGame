@@ -1,5 +1,6 @@
 import java.awt.event.*;
 import javax.swing.*;
+import java.util.Arrays;
 import java.util.Random;
 import java.awt.*;
 
@@ -14,9 +15,10 @@ public class Panel extends JPanel implements ActionListener{
 
     private final int[] X = new int[GAME_UNITS];
     private final int[] Y = new int[GAME_UNITS];
-
-    private int bodyParts = 3;
-    private int foodConsumed;
+    
+    private int bodyParts;
+    private int foodScore;
+    private int foodHighScore;
     private int foodX_position;
     private int foodY_position;
     private char direction = 'R';
@@ -24,17 +26,43 @@ public class Panel extends JPanel implements ActionListener{
 
     private Timer timer;
     private Random rand;
+    private JButton replayButton, exitButton;
+    private JFrame Frame;
  
-    public Panel(){
+    public Panel(final JFrame frame){
+        Frame = frame;
+
         rand = new Random();
         this.setPreferredSize(new Dimension(SCREENWIDTH,SCREENHEIGHT));
         this.setBackground(Color.BLACK);
         this.setFocusable(true);
         this.addKeyListener(new GameKeyAdapter());
+
+        replayButton = new JButton("Click to play");
+        replayButton.setBounds(120,100,200,125);
+        replayButton.addActionListener(this);
+        replayButton.setFocusable(false);
+        replayButton.setBackground(Color.BLACK);
+        replayButton.setFont(new Font("Comic Sans",Font.BOLD,25));
+        replayButton.setForeground(Color.ORANGE);
+
+        exitButton = new JButton("Click to exit");
+        exitButton.setBounds(320,100,200,125);
+        exitButton.addActionListener(this);
+        exitButton.setFocusable(false);
+        exitButton.setBackground(Color.BLACK);
+        exitButton.setFont(new Font("Comic Sans",Font.BOLD,25));
+        exitButton.setForeground(Color.WHITE);
+        
         startGame();        
     }
 
     public void startGame(){
+        bodyParts = 3;
+        foodScore = 0;
+        Arrays.fill(this.X,0);
+        Arrays.fill(this.Y,0);
+        this.direction = 'R';
         makeFood();
         this.running = true;
         timer = new Timer(DELAY,this);
@@ -69,7 +97,7 @@ public class Panel extends JPanel implements ActionListener{
             g.setColor(Color.red);
             g.setFont(new Font("Comic Sans",Font.ITALIC,40));
             FontMetrics metrics = getFontMetrics(g.getFont());
-            g.drawString("Score: " + this.foodConsumed, (SCREENWIDTH - metrics.stringWidth("Score: " + this.foodConsumed))/2, g.getFont().getSize());
+            g.drawString("Score: " + this.foodScore, (SCREENWIDTH - metrics.stringWidth("Score: " + this.foodScore))/2, g.getFont().getSize());
         }
         else{
             gameOver(g);
@@ -104,7 +132,7 @@ public class Panel extends JPanel implements ActionListener{
     public void checkFood(){
         if((this.X[0] == this.foodX_position) && this.Y[0] == this.foodY_position){
             bodyParts++;
-            foodConsumed++;
+            foodScore++;
             makeFood();
         }
     }
@@ -140,12 +168,23 @@ public class Panel extends JPanel implements ActionListener{
         g.setColor(Color.red);
         g.setFont(new Font("Comic Sans",Font.ITALIC,60));
         FontMetrics metrics_one = getFontMetrics(g.getFont());
-        g.drawString("Score: " + this.foodConsumed, (SCREENWIDTH - metrics_one.stringWidth("Score: " + this.foodConsumed))/2, g.getFont().getSize());
+        g.drawString("Score: " + this.foodScore, (SCREENWIDTH - metrics_one.stringWidth("Score: " + this.foodScore))/2, g.getFont().getSize());
+
+        if(foodScore > foodHighScore) foodHighScore = foodScore;
+
+        g.setColor(Color.CYAN);
+        g.setFont(new Font("Comic Sans",Font.BOLD,70));
+        FontMetrics metrics_two = getFontMetrics(g.getFont());
+        g.drawString("High Score: " + this.foodHighScore, (SCREENWIDTH - metrics_two.stringWidth("High Score: " + this.foodHighScore))/2, SCREENHEIGHT - (g.getFont().getSize()));
+
+
+        this.add(replayButton);
+        this.add(exitButton);
 
         g.setColor(Color.YELLOW);
         g.setFont(new Font("Comic Sans", Font.BOLD,80));
-        FontMetrics metrics_two = getFontMetrics(g.getFont());
-        g.drawString("Game over", (SCREENWIDTH - metrics_two.stringWidth("Game over"))/2, SCREENHEIGHT/2);
+        FontMetrics metrics_three = getFontMetrics(g.getFont());
+        g.drawString("Game over", (SCREENWIDTH - metrics_three.stringWidth("Game over"))/2, SCREENHEIGHT/2);
 
     }
 
@@ -158,6 +197,14 @@ public class Panel extends JPanel implements ActionListener{
             checkCollisions();
         }
         repaint();
+        if(e.getSource() == replayButton){
+            startGame();
+            this.remove(replayButton);
+            this.remove(exitButton);
+        }
+        else if(e.getSource() == exitButton){
+            this.Frame.dispose();
+        }
         
     }
 
