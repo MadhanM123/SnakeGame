@@ -27,10 +27,10 @@ public class Panel extends JPanel implements ActionListener{
     private Timer timer;
     private Random rand;
     private JButton replayButton, exitButton;
-    private JFrame Frame;
+    private final JFrame Frame;
  
-    public Panel(final JFrame frame){
-        Frame = frame;
+    public Panel(JFrame Frame){
+        this.Frame = Frame;
 
         rand = new Random();
         this.setPreferredSize(new Dimension(SCREENWIDTH,SCREENHEIGHT));
@@ -39,7 +39,7 @@ public class Panel extends JPanel implements ActionListener{
         this.addKeyListener(new GameKeyAdapter());
 
         replayButton = new JButton("Click to play");
-        replayButton.setBounds(120,100,200,125);
+        replayButton.setBounds(130,100,200,125);
         replayButton.addActionListener(this);
         replayButton.setFocusable(false);
         replayButton.setBackground(Color.BLACK);
@@ -47,7 +47,7 @@ public class Panel extends JPanel implements ActionListener{
         replayButton.setForeground(Color.ORANGE);
 
         exitButton = new JButton("Click to exit");
-        exitButton.setBounds(320,100,200,125);
+        exitButton.setBounds(380,100,200,125);
         exitButton.addActionListener(this);
         exitButton.setFocusable(false);
         exitButton.setBackground(Color.BLACK);
@@ -203,7 +203,7 @@ public class Panel extends JPanel implements ActionListener{
             this.remove(exitButton);
         }
         else if(e.getSource() == exitButton){
-            this.Frame.dispose();
+            this.Frame.dispatchEvent(new WindowEvent(Frame, WindowEvent.WINDOW_CLOSING));
         }
         
     }
